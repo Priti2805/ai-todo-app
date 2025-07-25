@@ -1,0 +1,238 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🚀 AI Todo App</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 50px auto; 
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 15px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .header { text-align: center; margin-bottom: 30px; }
+        .add-section { margin-bottom: 20px; }
+        .todo-input { 
+            width: 70%; 
+            padding: 10px; 
+            font-size: 16px; 
+            border: 2px solid #ddd; 
+            border-radius: 5px; 
+        }
+        .add-btn { 
+            width: 25%; 
+            padding: 10px; 
+            font-size: 16px; 
+            background: #4f46e5; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            margin-left: 10px;
+        }
+        .add-btn:hover { background: #4338ca; }
+        .todo-item { 
+            padding: 15px; 
+            margin: 10px 0; 
+            background: #f8f9fa; 
+            border-radius: 8px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between;
+        }
+        .todo-text { flex: 1; margin: 0 15px; }
+        .todo-actions button { 
+            margin: 0 5px; 
+            padding: 5px 10px; 
+            border: none; 
+            border-radius: 3px; 
+            cursor: pointer; 
+        }
+        .translate-btn { background: #10b981; color: white; }
+        .delete-btn { background: #ef4444; color: white; }
+        .language-select { 
+            padding: 8px; 
+            margin: 10px; 
+            border-radius: 5px; 
+            border: 1px solid #ddd; 
+        }
+        .translation { 
+            margin-top: 10px; 
+            padding: 10px; 
+            background: #e6fffa; 
+            border-left: 4px solid #10b981; 
+        }
+        .message { 
+            padding: 10px; 
+            margin: 10px 0; 
+            border-radius: 5px; 
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 AI Todo App</h1>
+            <p>Smart task management with translation</p>
+        </div>
+
+        <div class="add-section">
+            <input type="text" id="todo-input" class="todo-input" placeholder="What needs to be done?">
+            <button id="add-btn" class="add-btn">Add Todo</button>
+        </div>
+
+        <div>
+            <label>🌍 Translate to: </label>
+            <select id="language-select" class="language-select">
+                {% for code, name in languages.items() %}
+                <option value="{{ code }}">{{ name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div id="messages"></div>
+        <div id="todos-container">
+            <p style="text-align: center; color: #666; padding: 20px;">
+                📝 No todos yet! Add one above to get started.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        let currentLanguage = 'es';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTodos();
+            document.getElementById('add-btn').onclick = addTodo;
+            document.getElementById('todo-input').onkeypress = function(e) {
+                if (e.key === 'Enter') addTodo();
+            };
+            document.getElementById('language-select').onchange = function() {
+                currentLanguage = this.value;
+            };
+        });
+
+        function showMessage(text, type) {
+            const div = document.createElement('div');
+            div.className = `message ${type}`;
+            div.textContent = text;
+            document.getElementById('messages').appendChild(div);
+            setTimeout(() => div.remove(), 3000);
+        }
+
+        async function loadTodos() {
+            try {
+                const response = await fetch('/api/todos');
+                const data = await response.json();
+                if (data.success) {
+                    renderTodos(data.todos);
+                }
+            } catch (error) {
+                showMessage('Error loading todos', 'error');
+            }
+        }
+
+        async function addTodo() {
+            const input = document.getElementById('todo-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            try {
+                const response = await fetch('/api/todos', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({text: text})
+                });
+                const data = await response.json();
+                if (data.success) {
+                    input.value = '';
+                    showMessage('Todo added! ✅', 'success');
+                    loadTodos();
+                }
+            } catch (error) {
+                showMessage('Error adding todo', 'error');
+            }
+        }
+
+        async function toggleTodo(id, completed) {
+            try {
+                await fetch(`/api/todos/${id}`, {
+                    method: 'PUT',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({completed: completed})
+                });
+                loadTodos();
+            } catch (error) {
+                showMessage('Error updating todo', 'error');
+            }
+        }
+
+        async function deleteTodo(id) {
+            if (!confirm('Delete this todo?')) return;
+            try {
+                await fetch(`/api/todos/${id}`, {method: 'DELETE'});
+                showMessage('Todo deleted! 🗑️', 'success');
+                loadTodos();
+            } catch (error) {
+                showMessage('Error deleting todo', 'error');
+            }
+        }
+
+        async function translateTodo(id, button) {
+            button.textContent = '⏳ Translating...';
+            try {
+                const response = await fetch('/api/translate', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({todo_id: id, target_language: currentLanguage})
+                });
+                const data = await response.json();
+                if (data.success) {
+                    const todoElement = button.closest('.todo-item');
+                    let translationDiv = todoElement.querySelector('.translation');
+                    if (!translationDiv) {
+                        translationDiv = document.createElement('div');
+                        translationDiv.className = 'translation';
+                        todoElement.appendChild(translationDiv);
+                    }
+                    translationDiv.innerHTML = `<strong>Translation:</strong> "${data.translation.translated_text}"`;
+                    showMessage('Translated! 🌍', 'success');
+                }
+            } catch (error) {
+                showMessage('Translation error', 'error');
+            }
+            button.textContent = '🌍 Translate';
+        }
+
+        function renderTodos(todos) {
+            const container = document.getElementById('todos-container');
+            if (todos.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">📝 No todos yet! Add one above.</p>';
+                return;
+            }
+            container.innerHTML = todos.map(todo => `
+                <div class="todo-item">
+                    <input type="checkbox" ${todo.completed ? 'checked' : ''} 
+                           onchange="toggleTodo(${todo.id}, this.checked)">
+                    <div class="todo-text">${todo.text}</div>
+                    <div class="todo-actions">
+                        <button class="translate-btn" onclick="translateTodo(${todo.id}, this)">🌍 Translate</button>
+                        <button class="delete-btn" onclick="deleteTodo(${todo.id})">🗑️ Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
