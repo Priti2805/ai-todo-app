@@ -1,582 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Todo App with Translation</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            color: #333;
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .header p {
-            color: #666;
-            font-size: 1.1rem;
-        }
-
-        .input-section {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-
-        .todo-input {
-            flex: 1;
-            min-width: 200px;
-            padding: 15px;
-            border: 2px solid #e1e5e9;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-        }
-
-        .todo-input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .language-select {
-            padding: 15px;
-            border: 2px solid #e1e5e9;
-            border-radius: 10px;
-            font-size: 16px;
-            background: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .language-select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .add-btn {
-            padding: 15px 25px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            transform: translateY(0);
-        }
-
-        .add-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .stats {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            flex: 1;
-            min-width: 120px;
-            box-shadow: 0 10px 20px rgba(240, 147, 251, 0.3);
-        }
-
-        .stat-card:nth-child(2) {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        }
-
-        .stat-card:nth-child(3) {
-            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            opacity: 0.9;
-        }
-
-        .todo-list {
-            min-height: 200px;
-        }
-
-        .todo-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 20px;
-            margin-bottom: 15px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
-            animation: slideIn 0.3s ease;
-        }
-
-        .todo-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        .todo-item.completed {
-            opacity: 0.7;
-            background: #f8f9fa;
-        }
-
-        .todo-checkbox {
-            width: 24px;
-            height: 24px;
-            border: 2px solid #667eea;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            flex-shrink: 0;
-        }
-
-        .todo-checkbox.checked {
-            background: #667eea;
-            color: white;
-        }
-
-        .todo-text {
-            flex: 1;
-            font-size: 16px;
-            color: #333;
-            transition: all 0.3s ease;
-        }
-
-        .todo-text.completed {
-            text-decoration: line-through;
-            color: #999;
-        }
-
-        .translate-btn {
-            padding: 8px 12px;
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
-            color: #333;
-            border: none;
-            border-radius: 8px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            flex-shrink: 0;
-        }
-
-        .translate-btn:hover {
-            transform: scale(1.05);
-        }
-
-        .delete-btn {
-            width: 30px;
-            height: 30px;
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            flex-shrink: 0;
-        }
-
-        .delete-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 50px 20px;
-            color: #666;
-            font-size: 1.2rem;
-        }
-
-        .empty-state .emoji {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            display: block;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                margin: 10px;
-                padding: 20px;
-            }
-
-            .header h1 {
-                font-size: 2rem;
-            }
-
-            .input-section {
-                flex-direction: column;
-            }
-
-            .stats {
-                flex-direction: column;
-            }
-
-            .stat-card {
-                min-width: auto;
-            }
-
-            .todo-item {
-                padding: 15px;
-                gap: 10px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Todo Translator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      background-color: #f0f0f0;
+    }
+    h1 {
+      color: #333;
+    }
+    input, select, button {
+      margin: 0.5rem 0;
+      padding: 0.5rem;
+      font-size: 1rem;
+    }
+    .task-list {
+      margin-top: 1rem;
+    }
+    .task-item {
+      background-color: #fff;
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
+      border-radius: 5px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .translated {
+      font-style: italic;
+      color: #666;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header Section -->
-        <div class="header">
-            <h1>🚀 AI Todo App</h1>
-            <p>Smart task management with translation</p>
-        </div>
+  <h1>AI Todo App with Translation</h1>
 
-        <!-- Input Section -->
-        <div class="input-section">
-            <input type="text" id="todoInput" class="todo-input" placeholder="Add a new todo..." maxlength="200">
-            <select id="languageSelect" class="language-select">
-                <option value="">🌍 Translate to:</option>
-                <option value="es">🇪🇸 Spanish</option>
-                <option value="fr">🇫🇷 French</option>
-                <option value="de">🇩🇪 German</option>
-                <option value="it">🇮🇹 Italian</option>
-                <option value="pt">🇵🇹 Portuguese</option>
-                <option value="zh">🇨🇳 Chinese</option>
-                <option value="ja">🇯🇵 Japanese</option>
-                <option value="ko">🇰🇷 Korean</option>
-                <option value="ar">🇸🇦 Arabic</option>
-                <option value="hi">🇮🇳 Hindi</option>
-                <option value="ru">🇷🇺 Russian</option>
-                <option value="nl">🇳🇱 Dutch</option>
-                <option value="sv">🇸🇪 Swedish</option>
-                <option value="no">🇳🇴 Norwegian</option>
-                <option value="pl">🇵🇱 Polish</option>
-            </select>
-            <button id="addBtn" class="add-btn">Add Todo</button>
-        </div>
+  <label for="taskInput">Enter your task:</label><br/>
+  <input type="text" id="taskInput" placeholder="e.g., Go for a walk"/><br/>
 
-        <!-- Statistics Section -->
-        <div class="stats">
-            <div class="stat-card">
-                <div class="stat-number" id="totalCount">0</div>
-                <div class="stat-label">Total</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="completedCount">0</div>
-                <div class="stat-label">Completed</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="pendingCount">0</div>
-                <div class="stat-label">Pending</div>
-            </div>
-        </div>
+  <label for="languageSelect">Select language:</label><br/>
+  <select id="languageSelect">
+    <option value="es">Spanish</option>
+    <option value="fr">French</option>
+    <option value="de">German</option>
+    <option value="hi">Hindi</option>
+    <option value="zh">Chinese</option>
+    <option value="ja">Japanese</option>
+    <option value="ru">Russian</option>
+    <option value="it">Italian</option>
+    <option value="pt">Portuguese</option>
+    <option value="ko">Korean</option>
+    <option value="ar">Arabic</option>
+    <option value="pl">Polish</option>
+    <option value="sv">Swedish</option>
+    <option value="no">Norwegian</option>
+    <option value="nl">Dutch</option>
+  </select><br/>
 
-        <!-- Todo List Section -->
-        <div id="todoList" class="todo-list">
-            <div class="empty-state">
-                <span class="emoji">📝</span>
-                No todos yet! Add one above to get started.
-            </div>
-        </div>
-    </div>
+  <button onclick="addTask()">Add Task</button>
 
-    <script>
-        // Todo App JavaScript Implementation
-        class TodoApp {
-            constructor() {
-                // Initialize app state
-                this.todos = this.loadTodos();
-                this.selectedLanguage = '';
-                
-                // Get DOM elements
-                this.todoInput = document.getElementById('todoInput');
-                this.addBtn = document.getElementById('addBtn');
-                this.todoList = document.getElementById('todoList');
-                this.languageSelect = document.getElementById('languageSelect');
-                this.totalCount = document.getElementById('totalCount');
-                this.completedCount = document.getElementById('completedCount');
-                this.pendingCount = document.getElementById('pendingCount');
-                
-                // Bind event listeners
-                this.bindEvents();
-                
-                // Initial render
-                this.render();
-            }
+  <div class="task-list" id="taskList"></div>
 
-            // Load todos from localStorage
-            loadTodos() {
-                try {
-                    const saved = localStorage.getItem('ai-todos');
-                    return saved ? JSON.parse(saved) : [];
-                } catch (error) {
-                    console.error('Error loading todos:', error);
-                    return [];
-                }
-            }
-
-            // Save todos to localStorage
-            saveTodos() {
-                try {
-                    localStorage.setItem('ai-todos', JSON.stringify(this.todos));
-                } catch (error) {
-                    console.error('Error saving todos:', error);
-                }
-            }
-
-            // Bind all event listeners
-            bindEvents() {
-                // Add todo button click
-                this.addBtn.addEventListener('click', () => this.addTodo());
-                
-                // Enter key in input field
-                this.todoInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') this.addTodo();
-                });
-                
-                // Language selection change
-                this.languageSelect.addEventListener('change', (e) => {
-                    this.selectedLanguage = e.target.value;
-                });
-            }
-
-            // Add a new todo
-            addTodo() {
-                const text = this.todoInput.value.trim();
-                if (!text) return;
-
-                const todo = {
-                    id: Date.now(),
-                    text: text,
-                    originalText: text,
-                    completed: false,
-                    translated: false,
-                    translatedText: ''
-                };
-
-                this.todos.unshift(todo); // Add to beginning
-                this.todoInput.value = '';
-                this.saveTodos();
-                this.render();
-            }
-
-            // Toggle todo completion
-            toggleTodo(id) {
-                const todo = this.todos.find(t => t.id === id);
-                if (todo) {
-                    todo.completed = !todo.completed;
-                    this.saveTodos();
-                    this.render();
-                }
-            }
-
-            // Delete a todo
-            deleteTodo(id) {
-                this.todos = this.todos.filter(t => t.id !== id);
-                this.saveTodos();
-                this.render();
-            }
-
-            // Translate a todo item
-            async translateTodo(id) {
-                if (!this.selectedLanguage) {
-                    alert('Please select a language first!');
-                    return;
-                }
-
-                const todo = this.todos.find(t => t.id === id);
-                if (!todo) return;
-
-                try {
-                    // Simulate AI translation (in real app, you'd call an API)
-                    const translatedText = await this.simulateTranslation(todo.originalText, this.selectedLanguage);
-                    
-                    todo.translated = true;
-                    todo.translatedText = translatedText;
-                    todo.text = translatedText;
-                    
-                    this.saveTodos();
-                    this.render();
-                } catch (error) {
-                    console.error('Translation error:', error);
-                    alert('Translation failed. Please try again.');
-                }
-            }
-
-            // Simulate translation (replace with real API in production)
-            async simulateTranslation(text, targetLang) {
-                // This is a simulation - in a real app, you'd use Google Translate API or similar
-                const translations = {
-                    'es': { 'Buy groceries': 'Comprar comestibles', 'Learn JavaScript': 'Aprender JavaScript', 'Call mom': 'Llamar a mamá' },
-                    'fr': { 'Buy groceries': 'Acheter des courses', 'Learn JavaScript': 'Apprendre JavaScript', 'Call mom': 'Appeler maman' },
-                    'de': { 'Buy groceries': 'Lebensmittel kaufen', 'Learn JavaScript': 'JavaScript lernen', 'Call mom': 'Mama anrufen' },
-                    'it': { 'Buy groceries': 'Comprare generi alimentari', 'Learn JavaScript': 'Imparare JavaScript', 'Call mom': 'Chiamare la mamma' },
-                    'pt': { 'Buy groceries': 'Comprar mantimentos', 'Learn JavaScript': 'Aprender JavaScript', 'Call mom': 'Ligar para a mamãe' },
-                    'zh': { 'Buy groceries': '买菜', 'Learn JavaScript': '学习JavaScript', 'Call mom': '给妈妈打电话' },
-                    'ja': { 'Buy groceries': '食料品を買う', 'Learn JavaScript': 'JavaScriptを学ぶ', 'Call mom': 'お母さんに電話する' },
-                    'ko': { 'Buy groceries': '장보기', 'Learn JavaScript': 'JavaScript 배우기', 'Call mom': '엄마에게 전화하기' },
-                    'ar': { 'Buy groceries': 'شراء البقالة', 'Learn JavaScript': 'تعلم JavaScript', 'Call mom': 'اتصال بأمي' },
-                    'hi': { 'Buy groceries': 'किराना खरीदें', 'Learn JavaScript': 'JavaScript सीखें', 'Call mom': 'माँ को कॉल करें' },
-                    'ru': { 'Buy groceries': 'Купить продукты', 'Learn JavaScript': 'Изучить JavaScript', 'Call mom': 'Позвонить маме' },
-                    'nl': { 'Buy groceries': 'Boodschappen doen', 'Learn JavaScript': 'JavaScript leren', 'Call mom': 'Mama bellen' },
-                    'sv': { 'Buy groceries': 'Köp mat', 'Learn JavaScript': 'Lär dig JavaScript', 'Call mom': 'Ring mamma' },
-                    'no': { 'Buy groceries': 'Kjøp mat', 'Learn JavaScript': 'Lær JavaScript', 'Call mom': 'Ring mamma' },
-                    'pl': { 'Buy groceries': 'Kupić artykuły spożywcze', 'Learn JavaScript': 'Ucz się JavaScript', 'Call mom': 'Zadzwoń do mamy' }
-                };
-
-                // Simulate API delay
-                await new Promise(resolve => setTimeout(resolve, 500));
-
-                // Return translation if available, otherwise try basic word replacement
-                const langTranslations = translations[targetLang];
-                if (langTranslations && langTranslations[text]) {
-                    return langTranslations[text];
-                }
-                
-                // Basic word replacement for Hindi (you can expand this)
-                if (targetLang === 'hi') {
-                    const basicWords = {
-                        'buy': 'खरीदें',
-                        'pen': 'पेन',
-                        'book': 'किताब',
-                        'water': 'पानी',
-                        'food': 'खाना',
-                        'house': 'घर',
-                        'work': 'काम',
-                        'read': 'पढ़ें',
-                        'write': 'लिखें',
-                        'eat': 'खाएं',
-                        'drink': 'पिएं',
-                        'go': 'जाएं',
-                        'come': 'आएं',
-                        'see': 'देखें',
-                        'listen': 'सुनें'
-                    };
-                    
-                    let translated = text.toLowerCase();
-                    for (const [english, hindi] of Object.entries(basicWords)) {
-                        translated = translated.replace(new RegExp(english, 'gi'), hindi);
-                    }
-                    
-                    if (translated !== text.toLowerCase()) {
-                        return translated;
-                    }
-                }
-                
-                // Final fallback
-                return `[${targetLang.toUpperCase()}] ${text}`;
-            }
-
-            // Update statistics
-            updateStats() {
-                const total = this.todos.length;
-                const completed = this.todos.filter(t => t.completed).length;
-                const pending = total - completed;
-
-                this.totalCount.textContent = total;
-                this.completedCount.textContent = completed;
-                this.pendingCount.textContent = pending;
-            }
-
-            // Render the entire app
-            render() {
-                this.updateStats();
-                
-                if (this.todos.length === 0) {
-                    this.todoList.innerHTML = `
-                        <div class="empty-state">
-                            <span class="emoji">📝</span>
-                            No todos yet! Add one above to get started.
-                        </div>
-                    `;
-                    return;
-                }
-
-                this.todoList.innerHTML = this.todos.map(todo => `
-                    <div class="todo-item ${todo.completed ? 'completed' : ''}">
-                        <div class="todo-checkbox ${todo.completed ? 'checked' : ''}" 
-                             onclick="app.toggleTodo(${todo.id})">
-                            ${todo.completed ? '✓' : ''}
-                        </div>
-                        <div class="todo-text ${todo.completed ? 'completed' : ''}">${todo.text}</div>
-                        <button class="translate-btn" onclick="app.translateTodo(${todo.id})">
-                            ${todo.translated ? '🔄' : '🌍'}
-                        </button>
-                        <button class="delete-btn" onclick="app.deleteTodo(${todo.id})">×</button>
-                    </div>
-                `).join('');
-            }
-        }
-
-        // Initialize the app when DOM is loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            window.app = new TodoApp();
+  <script>
+    async function translateText(text, targetLang) {
+      try {
+        const response = await fetch('/translate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, targetLang })
         });
-    </script>
+        const data = await response.json();
+        return data.translatedText || '(Translation error)';
+      } catch (error) {
+        console.error('Translation failed:', error);
+        return '(Translation failed)';
+      }
+    }
+
+    async function addTask() {
+      const taskInput = document.getElementById('taskInput');
+      const languageSelect = document.getElementById('languageSelect');
+      const taskList = document.getElementById('taskList');
+
+      const taskText = taskInput.value.trim();
+      const selectedLang = languageSelect.value;
+
+      if (!taskText) return;
+
+      const translatedText = await translateText(taskText, selectedLang);
+
+      const taskItem = document.createElement('div');
+      taskItem.className = 'task-item';
+      taskItem.innerHTML = `
+        <strong>${taskText}</strong>
+        <div class="translated">→ ${translatedText}</div>
+      `;
+      taskList.appendChild(taskItem);
+
+      taskInput.value = '';
+    }
+  </script>
 </body>
 </html>
