@@ -1,113 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>AI Todo App with Translation</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 2em;
-            background: #f0f4f8;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI ToDo App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
 
-        h1 {
-            text-align: center;
-        }
+    h1 {
+      text-align: center;
+    }
 
-        .container {
-            max-width: 500px;
-            margin: auto;
-            background: white;
-            padding: 1em;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
+    #todoInput {
+      width: 70%;
+      padding: 10px;
+      font-size: 16px;
+    }
 
-        input, select, button {
-            width: 100%;
-            padding: 0.75em;
-            margin: 0.5em 0;
-            font-size: 1em;
-        }
+    #addBtn {
+      padding: 10px 20px;
+      font-size: 16px;
+    }
 
-        ul {
-            list-style: none;
-            padding: 0;
-        }
+    select {
+      padding: 10px;
+      margin-left: 10px;
+      font-size: 16px;
+    }
 
-        li {
-            background: #e0e7ff;
-            margin: 0.5em 0;
-            padding: 0.75em;
-            border-radius: 4px;
-        }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
 
-        .translated {
-            font-size: 0.9em;
-            color: #555;
-        }
-    </style>
+    li {
+      padding: 10px;
+      margin: 5px 0;
+      background-color: #f0f0f0;
+      cursor: pointer;
+    }
+
+    li.completed {
+      text-decoration: line-through;
+      background-color: #d4edda;
+    }
+
+    .translation {
+      color: #888;
+      font-size: 14px;
+    }
+  </style>
 </head>
 <body>
-    <h1>🌐 AI Todo Translator</h1>
-    <div class="container">
-        <input type="text" id="taskInput" placeholder="Enter your task...">
-        <select id="languageSelect">
-            <option value="es">Spanish</option>
-            <option value="fr">French</option>
-            <option value="de">German</option>
-            <option value="it">Italian</option>
-            <option value="pt">Portuguese</option>
-            <option value="zh">Chinese</option>
-            <option value="ja">Japanese</option>
-            <option value="ko">Korean</option>
-            <option value="ar">Arabic</option>
-            <option value="hi">Hindi</option>
-            <option value="ru">Russian</option>
-            <option value="nl">Dutch</option>
-            <option value="sv">Swedish</option>
-            <option value="no">Norwegian</option>
-            <option value="pl">Polish</option>
-        </select>
-        <button onclick="addTask()">Add Task with Translation</button>
-        <ul id="taskList"></ul>
-    </div>
+  <h1>🧠 AI Todo App</h1>
+  <input type="text" id="todoInput" placeholder="Enter a to-do item" />
+  <button id="addBtn">Add</button>
 
-    <script>
-        async function addTask() {
-            const input = document.getElementById('taskInput');
-            const language = document.getElementById('languageSelect').value;
-            const task = input.value.trim();
-            if (!task) return;
+  <select id="languageSelect">
+    <option value="es">Spanish 🇪🇸</option>
+    <option value="fr">French 🇫🇷</option>
+    <option value="de">German 🇩🇪</option>
+    <option value="it">Italian 🇮🇹</option>
+    <option value="pt">Portuguese 🇵🇹</option>
+    <option value="zh">Chinese 🇨🇳</option>
+    <option value="ja">Japanese 🇯🇵</option>
+    <option value="ko">Korean 🇰🇷</option>
+    <option value="ar">Arabic 🇸🇦</option>
+    <option value="hi">Hindi 🇮🇳</option>
+    <option value="ru">Russian 🇷🇺</option>
+    <option value="nl">Dutch 🇳🇱</option>
+    <option value="sv">Swedish 🇸🇪</option>
+    <option value="no">Norwegian 🇳🇴</option>
+    <option value="pl">Polish 🇵🇱</option>
+  </select>
 
-            const translated = await simulateTranslation(task, language);
-            const taskList = document.getElementById('taskList');
-            const listItem = document.createElement('li');
-            listItem.innerHTML = `<strong>${task}</strong><div class="translated">→ ${translated}</div>`;
-            taskList.appendChild(listItem);
+  <ul id="todoList"></ul>
 
-            input.value = '';
-        }
+  <script>
+    const input = document.getElementById("todoInput");
+    const addBtn = document.getElementById("addBtn");
+    const todoList = document.getElementById("todoList");
+    const languageSelect = document.getElementById("languageSelect");
 
-        async function simulateTranslation(text, targetLang) {
-            try {
-                const encodedText = encodeURIComponent(text);
-                const encodedLang = encodeURIComponent(targetLang);
+    addBtn.addEventListener("click", async () => {
+      const text = input.value.trim();
+      const lang = languageSelect.value;
+      if (!text) return;
 
-                // This is a simulation; replace with real translation API call
-                const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodedText}&langpair=en|${encodedLang}`);
-                const data = await response.json();
+      // Send translation request to backend
+      const response = await fetch("/translate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ text, target_lang: lang })
+      });
 
-                if (data.responseData.translatedText) {
-                    return data.responseData.translatedText;
-                } else {
-                    return "(Translation failed)";
-                }
-            } catch (error) {
-                return "(Translation error)";
-            }
-        }
-    </script>
+      const data = await response.json();
+      const translated = data.translated_text || "(Translation failed)";
+
+      const li = document.createElement("li");
+      li.textContent = text;
+      li.addEventListener("click", () => {
+        li.classList.toggle("completed");
+      });
+
+      const translationEl = document.createElement("div");
+      translationEl.classList.add("translation");
+      translationEl.textContent = translated;
+
+      li.appendChild(translationEl);
+      todoList.appendChild(li);
+      input.value = "";
+    });
+  </script>
 </body>
 </html>
