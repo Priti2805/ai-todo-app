@@ -492,11 +492,44 @@
                 // Simulate API delay
                 await new Promise(resolve => setTimeout(resolve, 500));
 
-                // Return translation if available, otherwise return a generic translated version
+                // Return translation if available, otherwise try basic word replacement
                 const langTranslations = translations[targetLang];
-                return langTranslations && langTranslations[text] 
-                    ? langTranslations[text] 
-                    : `[${targetLang.toUpperCase()}] ${text}`;
+                if (langTranslations && langTranslations[text]) {
+                    return langTranslations[text];
+                }
+                
+                // Basic word replacement for Hindi (you can expand this)
+                if (targetLang === 'hi') {
+                    const basicWords = {
+                        'buy': 'खरीदें',
+                        'pen': 'पेन',
+                        'book': 'किताब',
+                        'water': 'पानी',
+                        'food': 'खाना',
+                        'house': 'घर',
+                        'work': 'काम',
+                        'read': 'पढ़ें',
+                        'write': 'लिखें',
+                        'eat': 'खाएं',
+                        'drink': 'पिएं',
+                        'go': 'जाएं',
+                        'come': 'आएं',
+                        'see': 'देखें',
+                        'listen': 'सुनें'
+                    };
+                    
+                    let translated = text.toLowerCase();
+                    for (const [english, hindi] of Object.entries(basicWords)) {
+                        translated = translated.replace(new RegExp(english, 'gi'), hindi);
+                    }
+                    
+                    if (translated !== text.toLowerCase()) {
+                        return translated;
+                    }
+                }
+                
+                // Final fallback
+                return `[${targetLang.toUpperCase()}] ${text}`;
             }
 
             // Update statistics
