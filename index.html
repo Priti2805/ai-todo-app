@@ -1,165 +1,663 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>🌈 AI Todo App</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, sans-serif;
-      background: linear-gradient(to right, #e0eafc, #cfdef3);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 40px;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 AI Todo App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    .app {
-      background: white;
-      border-radius: 20px;
-      padding: 30px;
-      width: 100%;
-      max-width: 600px;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
-    }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-    h1 {
-      text-align: center;
-      background: linear-gradient(to right, #667eea, #764ba2);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      font-size: 2.5rem;
-      margin-bottom: 20px;
-    }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
 
-    input, select, button {
-      width: 100%;
-      padding: 12px;
-      margin: 8px 0;
-      border: none;
-      border-radius: 10px;
-      font-size: 1rem;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
 
-    input {
-      background-color: #f7f9fc;
-    }
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
 
-    select {
-      background-color: #f0f4ff;
-    }
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
 
-    button {
-      background: linear-gradient(to right, #43e97b, #38f9d7);
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
+        .main-content {
+            padding: 30px;
+        }
 
-    button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(67, 233, 123, 0.3);
-    }
+        .todo-input-section {
+            margin-bottom: 30px;
+        }
 
-    ul {
-      list-style: none;
-      padding: 0;
-      margin-top: 20px;
-    }
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
 
-    li {
-      background: #ffffff;
-      border: 1px solid #e1e5ea;
-      border-radius: 12px;
-      padding: 15px;
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    }
+        .todo-input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
 
-    li.completed span.task {
-      text-decoration: line-through;
-      color: #999;
-    }
+        .todo-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
 
-    span.translated {
-      display: block;
-      font-size: 0.85rem;
-      color: #666;
-      margin-top: 5px;
-    }
-  </style>
+        .btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #495057;
+            border: 2px solid #e1e5e9;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+
+        .translation-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .language-select {
+            padding: 10px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .todo-list {
+            margin-top: 30px;
+        }
+
+        .todo-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .stats-item {
+            text-align: center;
+        }
+
+        .stats-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stats-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .todo-item {
+            background: white;
+            border: 2px solid #f0f0f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .todo-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            border-color: #667eea;
+        }
+
+        .todo-item.completed {
+            background: #f8fff8;
+            border-color: #28a745;
+        }
+
+        .todo-item.completed .todo-text {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .todo-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .todo-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .todo-text {
+            flex: 1;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .todo-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+
+        .todo-meta {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 10px;
+        }
+
+        .translation-result {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .translation-text {
+            font-style: italic;
+            color: #1976d2;
+            margin-bottom: 5px;
+        }
+
+        .translation-lang {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .todo-actions {
+                flex-direction: column;
+            }
+
+            .todo-stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="app">
-    <h1>🌤️ AI Todo App</h1>
-
-    <input id="todoInput" placeholder="e.g., Call mom" />
-    <select id="languageSelect">
-      <option value="Spanish">🇪🇸 Spanish</option>
-      <option value="French">🇫🇷 French</option>
-      <option value="German">🇩🇪 German</option>
-      <option value="Hindi">🇮🇳 Hindi</option>
-      <option value="Chinese">🇨🇳 Chinese</option>
-      <option value="Arabic">🇸🇦 Arabic</option>
-    </select>
-    <button onclick="addTodo()">➕ Add Todo & Translate</button>
-
-    <ul id="todoList"></ul>
-  </div>
-
-  <script>
-    async function addTodo() {
-      const input = document.getElementById('todoInput');
-      const lang = document.getElementById('languageSelect').value;
-      const taskText = input.value.trim();
-      if (!taskText) return;
-
-      // Save to backend
-      const saveRes = await fetch('/api/todos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: taskText })
-      });
-      const saveData = await saveRes.json();
-      const todoId = saveData.todo?.id;
-
-      // Translate
-      const transRes = await fetch('/api/translate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: taskText, target_language: lang })
-      });
-      const transData = await transRes.json();
-
-      renderTodo({
-        id: todoId,
-        text: taskText,
-        translated: transData.translated_text || '(translation failed)',
-        completed: false
-      });
-
-      input.value = '';
-    }
-
-    function renderTodo(todo) {
-      const li = document.createElement('li');
-      li.className = todo.completed ? 'completed' : '';
-      li.innerHTML = `
-        <div>
-          <span class="task">${todo.text}</span>
-          <span class="translated">→ ${todo.translated}</span>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 AI Todo App</h1>
+            <p>Your intelligent task manager with AI-powered translation</p>
         </div>
-        <input type="checkbox" onchange="this.closest('li').classList.toggle('completed')" />
-      `;
-      document.getElementById('todoList').appendChild(li);
-    }
-  </script>
+
+        <div class="main-content">
+            <!-- Alert messages -->
+            <div id="alert-container"></div>
+
+            <!-- Todo Input Section -->
+            <div class="todo-input-section">
+                <div class="input-group">
+                    <input 
+                        type="text" 
+                        id="todoInput" 
+                        class="todo-input" 
+                        placeholder="What needs to be done? ✨"
+                        maxlength="500"
+                    >
+                    <button class="btn btn-primary" onclick="addTodo()">
+                        <span>Add Todo</span>
+                        <span>➕</span>
+                    </button>
+                </div>
+
+                <!-- Translation Section -->
+                <div class="translation-section">
+                    <h3 style="margin-bottom: 15px;">🌍 AI Translation</h3>
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <label for="languageSelect">Translate to:</label>
+                        <select id="languageSelect" class="language-select">
+                            <option value="">Choose language...</option>
+                            <option value="Spanish">Spanish</option>
+                            <option value="French">French</option>
+                            <option value="German">German</option>
+                            <option value="Italian">Italian</option>
+                            <option value="Portuguese">Portuguese</option>
+                            <option value="Chinese">Chinese</option>
+                            <option value="Japanese">Japanese</option>
+                            <option value="Korean">Korean</option>
+                            <option value="Arabic">Arabic</option>
+                            <option value="Hindi">Hindi</option>
+                            <option value="Russian">Russian</option>
+                        </select>
+                        <button class="btn btn-secondary btn-small" onclick="translateAllTodos()">
+                            <span>Translate All</span>
+                            <span>🔄</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Todo Statistics -->
+            <div class="todo-stats" id="todoStats">
+                <div class="stats-item">
+                    <div class="stats-number" id="totalCount">0</div>
+                    <div class="stats-label">Total</div>
+                </div>
+                <div class="stats-item">
+                    <div class="stats-number" id="completedCount">0</div>
+                    <div class="stats-label">Completed</div>
+                </div>
+                <div class="stats-item">
+                    <div class="stats-number" id="pendingCount">0</div>
+                    <div class="stats-label">Pending</div>
+                </div>
+            </div>
+
+            <!-- Todo List -->
+            <div class="todo-list">
+                <div id="todoContainer">
+                    <!-- Todos will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let todos = [];
+        let isLoading = false;
+
+        // API base URL - adjust this for your deployment
+        const API_BASE = window.location.origin;
+
+        // Initialize app when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTodos();
+            
+            // Allow Enter key to add todo
+            document.getElementById('todoInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addTodo();
+                }
+            });
+        });
+
+        // Show alert messages
+        function showAlert(message, type = 'success') {
+            const alertContainer = document.getElementById('alert-container');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            
+            alertContainer.appendChild(alertDiv);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        // Load all todos from API
+        async function loadTodos() {
+            try {
+                const response = await fetch(`${API_BASE}/api/todos`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    todos = data.todos || [];
+                    renderTodos();
+                    updateStats();
+                } else {
+                    showAlert('Failed to load todos: ' + data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error loading todos:', error);
+                showAlert('Error connecting to server', 'error');
+            }
+        }
+
+        // Add a new todo
+        async function addTodo() {
+            const input = document.getElementById('todoInput');
+            const text = input.value.trim();
+            
+            if (!text) {
+                showAlert('Please enter a todo item', 'error');
+                return;
+            }
+
+            if (isLoading) return;
+            isLoading = true;
+
+            try {
+                const response = await fetch(`${API_BASE}/api/todos`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: text })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    input.value = '';
+                    showAlert('Todo added successfully! ✅');
+                    loadTodos(); // Reload to get updated list
+                } else {
+                    showAlert('Failed to add todo: ' + data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error adding todo:', error);
+                showAlert('Error connecting to server', 'error');
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        // Toggle todo completion status
+        async function toggleTodo(todoId) {
+            const todo = todos.find(t => t.id === todoId);
+            if (!todo) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/api/todos/${todoId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ completed: !todo.completed })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert(data.todo.completed ? 'Todo completed! 🎉' : 'Todo reopened');
+                    loadTodos(); // Reload to get updated list
+                } else {
+                    showAlert('Failed to update todo: ' + data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error updating todo:', error);
+                showAlert('Error connecting to server', 'error');
+            }
+        }
+
+        // Translate a single todo
+        async function translateTodo(todoId) {
+            const languageSelect = document.getElementById('languageSelect');
+            const targetLanguage = languageSelect.value;
+            
+            if (!targetLanguage) {
+                showAlert('Please select a language first', 'error');
+                return;
+            }
+
+            const todo = todos.find(t => t.id === todoId);
+            if (!todo) return;
+
+            // Show loading state
+            const translateBtn = document.querySelector(`[onclick="translateTodo(${todoId})"]`);
+            const originalText = translateBtn.innerHTML;
+            translateBtn.innerHTML = '<div class="loading"></div>';
+            translateBtn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_BASE}/api/translate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: todo.text,
+                        target_language: targetLanguage
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Find the todo item and add translation
+                    const todoElement = document.querySelector(`[data-todo-id="${todoId}"]`);
+                    let translationDiv = todoElement.querySelector('.translation-result');
+                    
+                    if (!translationDiv) {
+                        translationDiv = document.createElement('div');
+                        translationDiv.className = 'translation-result';
+                        todoElement.appendChild(translationDiv);
+                    }
+                    
+                    translationDiv.innerHTML = `
+                        <div class="translation-text">"${data.translated_text}"</div>
+                        <div class="translation-lang">Translated to ${data.target_language}</div>
+                    `;
+                    
+                    showAlert(`Translation completed! 🌍`);
+                } else {
+                    showAlert('Translation failed: ' + data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error translating:', error);
+                showAlert('Translation service unavailable', 'error');
+            } finally {
+                // Restore button
+                translateBtn.innerHTML = originalText;
+                translateBtn.disabled = false;
+            }
+        }
+
+        // Translate all todos
+        async function translateAllTodos() {
+            const languageSelect = document.getElementById('languageSelect');
+            const targetLanguage = languageSelect.value;
+            
+            if (!targetLanguage) {
+                showAlert('Please select a language first', 'error');
+                return;
+            }
+
+            if (todos.length === 0) {
+                showAlert('No todos to translate', 'error');
+                return;
+            }
+
+            showAlert(`Translating ${todos.length} todos to ${targetLanguage}...`);
+
+            for (const todo of todos) {
+                await translateTodo(todo.id);
+                // Small delay to avoid overwhelming the API
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+        }
+
+        // Render todos in the UI
+        function renderTodos() {
+            const container = document.getElementById('todoContainer');
+            
+            if (todos.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📝</div>
+                        <h3>No todos yet!</h3>
+                        <p>Add your first todo above to get started</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = todos.map(todo => `
+                <div class="todo-item ${todo.completed ? 'completed' : ''}" data-todo-id="${todo.id}">
+                    <div class="todo-header">
+                        <input 
+                            type="checkbox" 
+                            class="todo-checkbox" 
+                            ${todo.completed ? 'checked' : ''}
+                            onchange="toggleTodo(${todo.id})"
+                        >
+                        <div class="todo-text">${escapeHtml(todo.text)}</div>
+                        <div class="todo-actions">
+                            <button class="btn btn-secondary btn-small" onclick="translateTodo(${todo.id})">
+                                <span>Translate</span>
+                                <span>🌐</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="todo-meta">
+                        Created: ${formatDate(todo.created_at)}
+                        ${todo.completed ? ' • ✅ Completed' : ' • ⏳ Pending'}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update statistics
+        function updateStats() {
+            const total = todos.length;
+            const completed = todos.filter(t => t.completed).length;
+            const pending = total - completed;
+
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('completedCount').textContent = completed;
+            document.getElementById('pendingCount').textContent = pending;
+        }
+
+        // Utility functions
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'Unknown';
+            const date = new Date(dateString);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+    </script>
 </body>
 </html>
