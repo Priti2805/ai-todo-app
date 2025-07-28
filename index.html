@@ -2,120 +2,164 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <title>🌈 AI Todo App</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AI ToDo App</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: linear-gradient(to right, #e0eafc, #cfdef3);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px;
+    }
+
+    .app {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      width: 100%;
+      max-width: 600px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
     }
 
     h1 {
       text-align: center;
+      background: linear-gradient(to right, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 2.5rem;
+      margin-bottom: 20px;
     }
 
-    #todoInput {
-      width: 70%;
-      padding: 10px;
-      font-size: 16px;
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
 
-    #addBtn {
-      padding: 10px 20px;
-      font-size: 16px;
+    input {
+      background-color: #f7f9fc;
     }
 
     select {
-      padding: 10px;
-      margin-left: 10px;
-      font-size: 16px;
+      background-color: #f0f4ff;
+    }
+
+    button {
+      background: linear-gradient(to right, #43e97b, #38f9d7);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(67, 233, 123, 0.3);
     }
 
     ul {
       list-style: none;
       padding: 0;
+      margin-top: 20px;
     }
 
     li {
-      padding: 10px;
-      margin: 5px 0;
-      background-color: #f0f0f0;
-      cursor: pointer;
+      background: #ffffff;
+      border: 1px solid #e1e5ea;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     }
 
-    li.completed {
+    li.completed span.task {
       text-decoration: line-through;
-      background-color: #d4edda;
+      color: #999;
     }
 
-    .translation {
-      color: #888;
-      font-size: 14px;
+    span.translated {
+      display: block;
+      font-size: 0.85rem;
+      color: #666;
+      margin-top: 5px;
     }
   </style>
 </head>
 <body>
-  <h1>🧠 AI Todo App</h1>
-  <input type="text" id="todoInput" placeholder="Enter a to-do item" />
-  <button id="addBtn">Add</button>
+  <div class="app">
+    <h1>🌤️ AI Todo App</h1>
 
-  <select id="languageSelect">
-    <option value="es">Spanish 🇪🇸</option>
-    <option value="fr">French 🇫🇷</option>
-    <option value="de">German 🇩🇪</option>
-    <option value="it">Italian 🇮🇹</option>
-    <option value="pt">Portuguese 🇵🇹</option>
-    <option value="zh">Chinese 🇨🇳</option>
-    <option value="ja">Japanese 🇯🇵</option>
-    <option value="ko">Korean 🇰🇷</option>
-    <option value="ar">Arabic 🇸🇦</option>
-    <option value="hi">Hindi 🇮🇳</option>
-    <option value="ru">Russian 🇷🇺</option>
-    <option value="nl">Dutch 🇳🇱</option>
-    <option value="sv">Swedish 🇸🇪</option>
-    <option value="no">Norwegian 🇳🇴</option>
-    <option value="pl">Polish 🇵🇱</option>
-  </select>
+    <input id="todoInput" placeholder="e.g., Call mom" />
+    <select id="languageSelect">
+      <option value="Spanish">🇪🇸 Spanish</option>
+      <option value="French">🇫🇷 French</option>
+      <option value="German">🇩🇪 German</option>
+      <option value="Hindi">🇮🇳 Hindi</option>
+      <option value="Chinese">🇨🇳 Chinese</option>
+      <option value="Arabic">🇸🇦 Arabic</option>
+    </select>
+    <button onclick="addTodo()">➕ Add Todo & Translate</button>
 
-  <ul id="todoList"></ul>
+    <ul id="todoList"></ul>
+  </div>
 
   <script>
-    const input = document.getElementById("todoInput");
-    const addBtn = document.getElementById("addBtn");
-    const todoList = document.getElementById("todoList");
-    const languageSelect = document.getElementById("languageSelect");
+    async function addTodo() {
+      const input = document.getElementById('todoInput');
+      const lang = document.getElementById('languageSelect').value;
+      const taskText = input.value.trim();
+      if (!taskText) return;
 
-    addBtn.addEventListener("click", async () => {
-      const text = input.value.trim();
-      const lang = languageSelect.value;
-      if (!text) return;
+      // Save to backend
+      const saveRes = await fetch('/api/todos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: taskText })
+      });
+      const saveData = await saveRes.json();
+      const todoId = saveData.todo?.id;
 
-      // Send translation request to backend
-      const response = await fetch("/translate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ text, target_lang: lang })
+      // Translate
+      const transRes = await fetch('/api/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: taskText, target_language: lang })
+      });
+      const transData = await transRes.json();
+
+      renderTodo({
+        id: todoId,
+        text: taskText,
+        translated: transData.translated_text || '(translation failed)',
+        completed: false
       });
 
-      const data = await response.json();
-      const translated = data.translated_text || "(Translation failed)";
+      input.value = '';
+    }
 
-      const li = document.createElement("li");
-      li.textContent = text;
-      li.addEventListener("click", () => {
-        li.classList.toggle("completed");
-      });
-
-      const translationEl = document.createElement("div");
-      translationEl.classList.add("translation");
-      translationEl.textContent = translated;
-
-      li.appendChild(translationEl);
-      todoList.appendChild(li);
-      input.value = "";
-    });
+    function renderTodo(todo) {
+      const li = document.createElement('li');
+      li.className = todo.completed ? 'completed' : '';
+      li.innerHTML = `
+        <div>
+          <span class="task">${todo.text}</span>
+          <span class="translated">→ ${todo.translated}</span>
+        </div>
+        <input type="checkbox" onchange="this.closest('li').classList.toggle('completed')" />
+      `;
+      document.getElementById('todoList').appendChild(li);
+    }
   </script>
 </body>
 </html>
